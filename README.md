@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ejemplo API acelerómetro</title>
+
+    <meta charset="UTF-8">
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+
+    var datos = null;
+
+    //Espera a que Cordova haya cargado
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    function onDeviceReady() {
+        // iniciarDatos();
+    }
+
+    function iniciarDatos() {
+        //Se muestra la aceleración cada 1/10 segundos
+        var options = { frequency: 100 };
+        datos = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+    }
+
+    function pararDatos() {
+        if (datos) {
+            navigator.accelerometer.clearWatch(datos);
+            datos = null;
+        }
+    }
+
+    //Muestra por pantalla los datos de la aceleración
+    var top_data_list = 1;
+    var total_big = [];
+
+    function onSuccess(acceleration) {
+        var my_media = new Media('/android_asset/www/sound/whip.mp3');
+        var element = document.getElementById('acelerometro');
+        var result = document.getElementById('result');
+        var timestamp_data = acceleration.timestamp;
+        var a_x = acceleration.x;
+        var a_y = acceleration.y;
+        var a_z = acceleration.z;
+
+        var total = Math.sqrt(( a_x ^ 2 ) + ( a_y ^ 2 ) + ( a_z ^ 2 ));
+
+        element.innerHTML = 'Aceleración eje X: ' + a_x + '<br />' +
+                            'Aceleración eje Y: ' + a_y + '<br />' +
+                            'Aceleración eje Z: ' + a_z + '<br />' +
+                            'Timestamp: '       + timestamp_data + '<br />';
+
+
+        if (total != NaN && total > 6.5 ) {
+            my_media.play();
+            top_data.innerHTML = top_data_list++;
+            document.getElementById('img_logo').style.display='none';
+            document.getElementById('img_whip').style.display='block';
+            setTimeout(imag_reload, 3000);
+            topDatos(total);
+        }
+
+    }
+
+    function topDatos(total) {
+        total_big +=total + '<br> \n';
+        result.innerHTML = total_big;
+    }
+
+    setTimeout(imag_reload, 3000);
+    function imag_reload() {
+        document.getElementById('img_logo').style.display='block';
+        document.getElementById('img_whip').style.display='none';
+    }
+
+    function onError() {
+        alert('Ha ocurrido un error');
+    }
+
+    </script>
+  </head>
+  <body>
+    <img id="img_logo" src="img/logo.png">
+    <img id="img_whip" src="img/whip.jpeg" style="display:none">
+    <div id="acelerometro">Cargando...</div>
+    <div>Aceleración del dispositivo: <span id="result">Cargando resultado...</span></div>
+    <div>Número de latigazos: <span id="top_data"></span></div>
+    <button onclick="pararDatos(); return false;">Parar datos</button>
+    <button onclick="iniciarDatos(); return false;">Reanudar datos</button>
+  </body>
+</html>
